@@ -1,0 +1,6 @@
+<?php if ($this->helper('fi_checkout')->canPlaceOrder()): ?>
+<span class="process loading" style="display:none">&nbsp;</span>
+<button type="button" class="button btn-checkout" title="<?php echo $this->__('Place Order') ?>" id="place-order">
+    <span><span><?php echo $this->__('Place Order') ?></span></span>
+</button>
+<?php endif ?>

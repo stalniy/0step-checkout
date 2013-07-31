@@ -1,0 +1,5 @@
+<form id="newsletter-form">
+    <div class="total-field">
+        <input <?php $this->helper('fi_checkout')->isNewsletterChecked() && print 'checked="checked" '?>type="checkbox" id="subscriber" name="subscribe" value="1" title="<?php echo $this->__('Subscribe to Newsletter') ?>" class="checkbox"><label for="subscriber" class="fs-12" style="color:#666"><?php echo $this->__('Subscribe to our newsletter') ?></label>
+    </div>
+</form>

@@ -1,0 +1,21 @@
+<?php $count = sizeof($this->getMethods()) ?>
+<form id="payments" onsubmit="return false">
+    <dl class="sp-methods">
+    <?php foreach ($this->getMethods() as $_method): $_code = $_method->getCode() ?>
+        <?php $verifyUrl = $this->getVerifyCcUrl($_method) ?>
+        <dt>
+        <?php if ($count > 1): ?>
+            <input id="p_method_<?php echo $_code ?>" value="<?php echo $_code ?>" type="radio" name="payment[method]" title="<?php echo $this->htmlEscape($_method->getTitle()) ?>"<?php if($this->getSelectedMethodCode()==$_code): ?> checked="checked"<?php endif; ?> class="radio validate-one-required-by-name non-storable" data-action="<?php echo $verifyUrl ?>" />
+        <?php else: ?>
+            <span class="no-display"><input id="p_method_<?php echo $_code ?>" value="<?php echo $_code ?>" type="radio" name="payment[method]" checked="checked" class="radio non-storable" data-action="<?php echo $verifyUrl ?>" /></span>
+        <?php endif; ?>
+            <label for="p_method_<?php echo $_code ?>"><?php echo $this->getMethodTitle($_method) ?> <?php echo $this->getMethodLabelAfterHtml($_method) ?></label>
+        </dt>
+        <?php if ($html = $this->getPaymentMethodFormHtml($_method)): ?>
+        <dd>
+            <?php echo $html; ?>
+        </dd>
+        <?php endif; ?>
+    <?php endforeach; ?>
+    </dl>
+</form>

@@ -1,0 +1,119 @@
+<?php
+$isLoggedIn = $this->getFilled() && $this->isCustomerLoggedIn();
+$prefix     = $isLoggedIn ? 'logged' : 'new';
+$isLocationAsOneField = $this->helper('fi_checkout')->isLocationAsOneField();
+?>
+<form id="<?php echo $isLoggedIn ? 'registered-user-form' : 'new-user-form' ?>" action="<?php echo $this->helper('fi_checkout')->getPlaceUrl() ?>" method="post" name="user_info">
+    <div class="col2-set">
+        <div class="col-1 user-general">
+            <p class="required">* <?php echo $this->__('Required Fields') ?></p>
+            <div class="field">
+                <label><?php echo $this->__('Name') ?>*</label>
+                <input type="text" class="input-text required-entry<?php echo $isLoggedIn ? ' disabled' : '' ?>" name="user[name]" value="<?php echo $this->htmlEscape($this->getCustomerName()) ?>" <?php if ($isLoggedIn): ?> readonly="readonly"<?php endif ?> />
+            </div>
+            <div class="field relative">
+                <label><?php echo $this->__('Telephone') ?>*</label>
+                <input type="text" class="input-text required-entry<?php echo $isLoggedIn && $this->getCustomerPhone() ? ' disabled' : '' ?>" name="user[address][telephone]" value="<?php echo $this->htmlEscape($this->getCustomerPhone()) ?>" <?php if ($isLoggedIn && $this->getCustomerPhone()): ?> readonly="readonly"<?php endif ?> />
+            </div>
+            <div class="field">
+                <label><?php echo $this->__('E-mail') ?>*</label>
+                <input type="text" class="validate-email input-text required-entry<?php echo $isLoggedIn ? ' disabled' : '' ?>" name="user[email]" value="<?php echo $this->htmlEscape($this->getCustomerEmail()) ?>" <?php if ($isLoggedIn): ?> readonly="readonly"<?php endif ?> />
+            </div>
+            <?php if (!$isLoggedIn): ?>
+                <?php if ($this->helper('fi_checkout')->canShowPasswordField()): ?>
+                <div class="field">
+                    <label><?php echo $this->helper('checkout')->__('Password') ?>*</label>
+                    <input type="password" class="input-text required-entry validate-password non-storable" name="user[password]" />
+                </div>
+                <?php elseif ($this->helper('fi_checkout')->isPasswordAsTelephone()): ?>
+                    <span class="note">* <?php echo $this->__('Telephone number will be your password.') ?></span>
+                <?php elseif ($this->helper('fi_checkout')->isPasswordAuto()): ?>
+                    <span class="note">* <?php echo $this->__('Password will be automatically generated.') ?></span>
+                <?php endif ?>
+            <?php endif ?>
+        </div>
+        <div class="col-2">
+            <?php if (!$this->getQuote()->getIsVirtual()): ?>
+            <label class="tab-title"><?php echo $this->__('Shipping Methods') ?>*</label>
+            <div id="shipping-method-load" class="shipping-methods" data-action="<?php echo $this->helper('fi_checkout')->getUpdateUrl() ?>" data-update-sections="<?php echo $this->helper('fi_checkout')->shippingDependentSections() ?>">
+                <?php echo $this->getChildHtml('available_shipping_methods') ?>
+            </div>
+            <div id="shipping-method-additional-load">
+                <?php echo $this->getChildHtml('additional_shipping_methods') ?>
+            </div>
+            <?php endif ?>
+        </div>
+    </div>
+    <div class="col2-set row-bottom">
+        <div class="col-1 addresses">
+            <label class="tab-title"><?php echo $this->__('Shipping Address') ?></label>
+            <div class="field relative">
+                <?php if ($isLoggedIn): ?>
+                <input type="hidden" name="user[address][id]" value="<?php echo $this->getAddressId() ?>" />
+                <?php endif ?>
+                <?php if ($isLocationAsOneField): ?>
+                <div class="f-left">
+                    <input type="text" name="user[address][postcode]" class="input-text postcode w-30" value="<?php echo $this->htmlEscape($this->getCustomerZip()) ?>" />
+                    <p class="help"><?php echo $this->helper('checkout')->__('Zip/Post') ?></p>
+                </div>
+                <div class="f-left no-mr" data-action="<?php echo $this->getSecureUrl('fi_order/checkout/locationAutocomplete') ?>">
+                    <input id="<?php echo $prefix ?>_user_location" type="text" class="input-select input-text required-entry" name="user[address][location]" value="<?php echo $this->htmlEscape($this->getCustomerLocation()) ?>" />
+                    <a href="#" class="select-tip" tabindex="-1"></a>
+                    <div id="<?php echo $prefix ?>_user_loc_update" class="autocomplete"></div>
+                    <p class="help"><?php echo $this->getLocationHelp() ?>*</p>
+                </div>
+                <?php else: ?>
+                <div class="f-left loc-diff-fields">
+                    <?php if (!$this->helper('fi_checkout')->useOnlyDefaultCountry()): ?>
+                        <div class="f-left" data-action="<?php echo $this->getSecureUrl('fi_order/checkout/regions')?>">
+                            <?php echo $this->getCountryBlock()->setName('user[address][country_id]')->getHtml() ?>
+                            <p class="help"><?php echo $this->helper('checkout')->__('Country') ?>*</p>
+                        </div>
+                        <div class="f-left relative hidden-select no-mr">
+                            <input type="text" name="user[address][region]" class="input-text required-entry fake-title non-storable" value="<?php echo $this->htmlEscape($this->getCustomerRegion()) ?>" tabindex="-1" />
+                            <?php $select = $this->getRegionBlock()->setName('user[address][region_id]') ?>
+                            <?php echo $select->getHtml() ?>
+                            <p class="help"><?php echo $select->getTitle()?>*</p>
+                        </div>
+                    <?php endif ?>
+                    <div class="clear"></div>
+                    <div class="f-left">
+                        <input type="text" name="user[address][postcode]" class="input-text postcode non-storable" value="<?php echo $this->htmlEscape($this->getCustomerZip()) ?>" />
+                        <p class="help"><?php echo $this->helper('checkout')->__('Zip/Post') ?></p>
+                    </div>
+                    <div class="f-left no-mr">
+                        <input type="text" name="user[address][city]" class="input-text required-entry w-244" value="<?php echo $this->htmlEscape($this->getCustomerCity()) ?>" />
+                        <p class="help"><?php echo $this->helper('checkout')->__('City') ?>*</p>
+                    </div>
+                </div>
+                <?php endif ?>
+                <div class="clear"></div>
+            </div>
+            <div class="field">
+                <?php $showBuildRoomFields = $this->helper('fi_checkout')->showBuildRoomFields() ?>
+                <div class="f-left">
+                    <?php $street = $this->getStreet(); ?>
+                    <input type="text" class="input-street input-text required-entry<?php $showBuildRoomFields && print ' w-229' ?>" name="user[address][street][0]" value="<?php echo $this->htmlEscape($street) ?>" />
+                    <p class="help"><?php echo $this->__('Street') ?>*</p>
+                </div>
+                <?php if ($showBuildRoomFields): ?>
+                <div class="f-left small">
+                    <input type="text" class="input-text w-30" name="user[address][street][1]" value="<?php echo $this->htmlEscape($this->getCustomerBuilding()) ?>" />
+                    <p class="help"><?php echo $this->__('Build.') ?></p>
+                </div>
+                <div class="f-left small no-mr">
+                    <input type="text" class="input-text" name="user[address][street][2]" value="<?php echo $this->htmlEscape($this->getCustomerRoom()) ?>" />
+                    <p class="help"><?php echo $this->__('Room') ?></p>
+                </div>
+                <?php endif ?>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="col-2">
+            <label class="tab-title"><?php echo $this->__('Comment')?></label>
+            <div class="field">
+                <textarea name="user[note]"><?php echo $this->htmlEscape($this->getCustomerNote()) ?></textarea>
+            </div>
+        </div>
+    </div>
+</form>

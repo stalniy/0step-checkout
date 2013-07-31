@@ -1,0 +1,13 @@
+<div id="payment-methods" class="discount">
+    <h2><?php echo $this->__('Choose Payment Method') ?>*</h2>
+    <div>
+        <div id="payment-form" data-action="<?php echo $this->helper('fi_checkout')->getUpdateUrl() ?>" data-update-sections="<?php echo $this->helper('fi_checkout')->paymentDependentSections() ?>">
+            <?php echo $this->getChildHtml('methods') ?>
+        </div>
+    </div>
+    <div class="popup" id="payment-popup" style="display:none">
+        <a href="#" class="popup-close">x</a>
+        <div class="popup-heading"><h2><?php echo $this->__('Card Verification')?></h2></div>
+        <div class="popup-content"></div>
+    </div>
+</div>

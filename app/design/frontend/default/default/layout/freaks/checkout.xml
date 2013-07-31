@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category    FI
+ * @package     FI_Checkout
+ * @copyright   Copyright (c) 2012 Sergiy Stotskiy (http://freaksidea.com)
+ */
+-->
+<layout version="0.1.0">
+    <default>
+        <reference name="top.links">
+            <block type="fi_checkout/links" after="checkout_cart_link" />
+        </reference>
+    </default>
+
+    <checkout_cart_index>
+        <remove name="checkout.cart.top_methods" />
+        <remove name="checkout.cart.methods.onepage" />
+        <remove name="checkout.cart.shipping" />
+
+        <reference name="head">
+            <action method="addCss"><css>css/freaks.css</css></action>
+            <action method="addItem"><type>skin_js</type><name>js/freaks_checkout.js</name></action>
+        </reference>
+
+        <reference name="content">
+            <block type="fi_checkout/block" name="fi_checkout.page" as="fi_checkout_page" before="checkout.cart">
+                <block type="fi_checkout/block_info" name="fi_checkout.user_block" as="fi_checkout_user_block">
+                    <block type="checkout/onepage_shipping_method_available" name="fi_checkout.shipping_method.available" as="available_shipping_methods" template="freaks/checkout/shipping/available.phtml"/>
+                    <block type="checkout/onepage_shipping_method_additional" name="fi_checkout.shipping_method.additional" as="additional_shipping_methods" template="checkout/onepage/shipping_method/additional.phtml"/>
+                </block>
+            </block>
+        </reference>
+
+        <reference name="checkout.cart">
+            <block type="core/template" name="fi_checkout.payment" as="crosssell" template="freaks/checkout/payment.phtml">
+                <block type="fi_checkout/payment_methods" name="fi_checkout.payment_methods" as="methods" template="freaks/checkout/payment_methods.phtml" >
+                    <action method="setMethodFormTemplate"><method>purchaseorder</method><template>payment/form/purchaseorder.phtml</template></action>
+                </block>
+            </block>
+
+            <reference name="checkout.cart.coupon">
+                <block type="checkout/cart_crosssell" name="checkout.cart.crosssell" as="crosssell" template="checkout/cart/crosssell.phtml"/>
+                <action method="setTemplate"><template>freaks/checkout/coupon.phtml</template></action>
+            </reference>
+        </reference>
+
+        <reference name="checkout.cart.methods">
+            <block type="fi_checkout/newsletter" name="fi_checkout.newsletter" template="freaks/checkout/newsletter.phtml" after="checkout.onepage.agreements" />
+            <block type="checkout/agreements" name="checkout.onepage.agreements" as="agreements" template="freaks/checkout/agreements.phtml" before="checkout.cart.methods.multishipping" />
+            <block type="core/template" name="fi_checkout.place_order" template="freaks/checkout/link.phtml" after="checkout.onepage.agreements" />
+        </reference>
+    </checkout_cart_index>
+
+    <fi_checkout_update>
+        <reference name="content">
+            <block type="checkout/onepage_shipping_method_available" name="fi_checkout.shipping_method.available" as="available_shipping_methods" template="freaks/checkout/shipping/available.phtml"/>
+            <block type="checkout/onepage_shipping_method_additional" name="fi_checkout.shipping_method.additional" as="additional_shipping_methods" template="checkout/onepage/shipping_method/additional.phtml"/>
+            <block type="fi_checkout/payment_methods" name="fi_checkout.payment_methods" as="methods" template="freaks/checkout/payment_methods.phtml">
+                <action method="setMethodFormTemplate"><method>purchaseorder</method><template>payment/form/purchaseorder.phtml</template></action>
+            </block>
+            <block type="checkout/cart_totals" name="checkout.cart.totals" as="totals" template="checkout/cart/totals.phtml"/>
+        </reference>
+    </fi_checkout_update>
+
+    <fi_checkout_checkout_success>
+        <update handle="checkout_onepage_success" />
+    </fi_checkout_checkout_success>
+
+    <centinel_index_authenticationcomplete>
+        <reference name="root">
+            <action method="setTemplate"><template>freaks/checkout/centinel/complete.phtml</template></action>
+        </reference>
+    </centinel_index_authenticationcomplete>
+</layout>
